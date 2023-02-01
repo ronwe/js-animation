@@ -1,0 +1,107 @@
+<html>
+<style>
+html, body {
+margin: 0;
+}
+:root {
+	--clip-path-start: polygon(100px 0, 100px 0,200px 200px, 0 200px);
+	--clip-path-end: polygon(100px 0, 100px 0,200px 200px, 0 200px);
+}
+.square {
+	width: 200px;
+	height: 200px;
+	background-size: cover;
+}
+.shape1, .shape2 {
+display: inline-block;
+	width: 200px;
+	height: 200px;
+	background: green;
+}
+.shape1 {
+	clip-path: var(--clip-path-start);
+}
+.shape2 {
+	clip-path: var(--clip-path-end);
+}
+#from {
+	background-image: url(./panda.png);
+}
+#to {
+	background-image: url(./panda2.png);
+}
+.animate {
+	animation: move 3000ms infinite alternate ease-in-out;
+	background-image: url(./panda2.png);
+}
+@keyframes move {
+	0% {
+		clip-path: var(--clip-path-start);
+	}
+	50% {
+		background: green;
+	}
+	100% {
+		clip-path: var(--clip-path-end);
+		background-image: url(./panda2.png);
+		transform: translate(300px, 100px); 
+	}
+}
+#debug {
+	--cell-size: 4px;
+}
+#debug .tr, #debug .td{
+	height: var(--cell-size); 
+	
+}
+#debug .td{
+	display: inline-block;
+	width: var(--cell-size);
+}
+#debug .true {
+	background: green;	
+	cursor: pointer;
+}
+hr {
+	margin-top: 300px;
+}
+</style>
+<body>
+<div id="from" class="square"></div>
+<div id="to" class="square"></div>
+<hr/>
+<input type=checkbox id="debugChk" /> debug
+<div id="debug"></div>
+<div class="shape1"></div>
+<div class="shape2"></div>
+
+<script src="./dom-to-image.min.js"></script>
+<script src="./index.js"></script>
+<script>
+function updateCSSVariable(name, value) {
+	let root = document.documentElement
+	root.style.setProperty(name, value)
+}
+(async function() {
+	var from = document.getElementById('from')
+	var fromPolygon = await getPolygon(from)
+
+	var to = document.getElementById('to')
+	var toPolygon = await getPolygon(to)
+
+
+	let [start, end] = alignPolygon(fromPolygon, toPolygon)
+
+	var fromPath = getPolygonStr(start)	
+	var toPath = getPolygonStr(end)	
+
+	updateCSSVariable('--clip-path-start', fromPath)
+	updateCSSVariable('--clip-path-end', toPath)
+	
+	to.style.display = 'none'
+	from.className += ' animate'
+
+ })()
+</script>
+</body>
+</html>
